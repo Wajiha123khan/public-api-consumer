@@ -15,7 +15,7 @@ A simple python CLI Application  that fecthes country information/data using RES
 Clone the repository:
 
 ```bash
-git clone <your-repo-link>
+git clone (https://github.com/Wajiha123khan/public-api-consumer)
 ```
 
 Move into project folder:

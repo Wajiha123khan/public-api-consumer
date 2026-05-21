@@ -1,22 +1,38 @@
 import requests
 BASEURL = "https://restcountries.com/v3.1/name/" 
 
-def get_country_data(country_name):
+
+
+def fetch_country(country_name):
     try:
         response = requests.get(BASEURL + country_name, timeout=5)
 
+        
         if response.status_code == 404:
             print("Error: Country not found.")
             return
         elif response.status_code != 200:
             print("Error: API request failed.")
             return 
-        
+
         data = response.json()
         if not data:
-            print("Error: No data found for the specified country.")
+            return None
+
+        return data[0]
+
+    except requests.exceptions.RequestException:
+        return None
+
+def get_country_data(country_name):
+
+    try:
+        country = fetch_country(country_name)
+
+        if not country:
+            print("Error: Country not found or API issue.")
             return
-        country = data[0]
+       
         name = country.get("name",{}).get("common", "N/A")
         capital = country.get("capital", ["N/A"])[0]
         population = country.get("population", "N/A")
@@ -48,15 +64,70 @@ def get_country_data(country_name):
 
     except requests.exceptions.RequestException as e:
         print(f"Network Error: {e}")
-def main():
-    country_name = input("Enter country name: ").strip()
 
-    # Handle bad user input
-    if not country_name:
-        print("Error: Country name cannot be empty.")
+
+def compare_countries(country1, country2):
+    data1 = fetch_country(country1)
+    data2 = fetch_country(country2)
+
+    if not data1 or not data2:
+        print("Error: One or both countries not found.")
         return
 
-    get_country_data(country_name)
+    name1 = data1.get("name", {}).get("common", "N/A")
+    name2 = data2.get("name", {}).get("common", "N/A")
+
+    pop1 = data1.get("population", 0)
+    pop2 = data2.get("population", 0)
+
+    region1 = data1.get("region", "N/A")
+    region2 = data2.get("region", "N/A")
+
+    print("\n Country Comparison")
+    print("=" * 40)
+
+    print(f"{name1} Population: {pop1}")
+    print(f"{name2} Population: {pop2}")
+
+    if pop1 > pop2:
+        print(f"{name1} has larger population")
+    elif pop2 > pop1:
+        print(f"{name2} has larger population")
+    else:
+        print("Both have equal population")
+
+    print("\nRegion Comparison")
+    print(f"{name1}: {region1}")
+    print(f"{name2}: {region2}")
+
+def main():
+    print("\n=== Country Info Tool ===")
+    print("1. Single country info")
+    print("2. Compare two countries")
+
+    choice = input("Enter choice (1/2): ").strip()
+
+    if choice == "1":
+        country_name = input("Enter country name: ").strip()
+
+        if not country_name:
+            print("Error: Country name cannot be empty.")
+            return
+
+        get_country_data(country_name)
+
+    elif choice == "2":
+        country1 = input("Enter first country: ").strip()
+        country2 = input("Enter second country: ").strip()
+
+        if not country1 or not country2:
+            print("Error: Both country names are required.")
+            return
+
+        compare_countries(country1, country2)
+
+    else:
+        print("Invalid choice")
 
 
 if __name__ == "__main__":

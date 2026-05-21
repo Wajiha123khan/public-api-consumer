@@ -4,9 +4,14 @@ BASEURL = "https://restcountries.com/v3.1/name/"
 def get_country_data(country_name):
     try:
         response = requests.get(BASEURL + country_name, timeout=5)
-        if response.status_code != 200:
-            print("Error: Country not found or API request failed.")
+
+        if response.status_code == 404:
+            print("Error: Country not found.")
+            return
+        elif response.status_code != 200:
+            print("Error: API request failed.")
             return 
+        
         data = response.json()
         if not data:
             print("Error: No data found for the specified country.")
